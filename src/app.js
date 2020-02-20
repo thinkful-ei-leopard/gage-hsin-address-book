@@ -15,6 +15,7 @@ const morganOption = (NODE_ENV === 'production')
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send('Hello, boilerplate!');
@@ -28,7 +29,7 @@ app.get('/address', (req, res) => {
   });
   res
     .status(200)
-    .send(response);
+    .json(response);
 });
 
 //* Add Bearer Token Authorization middleware on ONLY the POST/DELETE routes
@@ -45,7 +46,7 @@ function validateBearerToken(req, res, next) {
 
 //* Create a POST route on /address that creates a new address
 app.post('/address', validateBearerToken, (req, res)=>{
-  const { firstName, lastName, address1, address2, city, state, zip } = req.query;
+  const { firstName, lastName, address1, address2, city, state, zip } = req.body;
   //* ALL fields except address2 are required
   if(!firstName){
     res.status(400).send('firstname is required');
@@ -89,7 +90,7 @@ app.post('/address', validateBearerToken, (req, res)=>{
    
   contacts.push(newAddress);
 
-  res.status(200).send(contacts);
+  res.status(201).location(`http://localhost:8000/address/${id}`).json({id:id});
 });
 
 //* Create a DELETE route on /address/:id
